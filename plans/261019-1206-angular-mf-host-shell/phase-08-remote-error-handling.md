@@ -1,7 +1,7 @@
 ---
 phase: 8
 title: "Xử lý lỗi remote"
-status: pending
+status: completed
 effort: 0.5d
 dependsOn: [7]
 ---
@@ -33,3 +33,15 @@ Remote không tải được (server chết, 404, lệch phiên bản, lỗi run
 
 ## Rollback
 Revert commit. Shell trở lại hành vi tải remote trực tiếp của phase 07.
+
+## Ghi chú triển khai
+- Trong thực tế, `initFederation` không ném lỗi khi `remoteEntry.json` của một remote trả 404 hoặc không tải được: shell vẫn khởi động (đã kiểm ở phase 06). Lỗi chỉ xuất hiện khi gọi `loadRemoteModule`, nên lớp bảo vệ được đặt tại `loadChildren`.
+- `loadRemoteRoutes` (trong `apps/shell/src/app/remote/load-remote-routes.ts`) có timeout 10 giây và kiểm tra `routes` có phải mảng không. Mọi lỗi đều trả về route dự phòng `**` dẫn tới `RemoteErrorPage`.
+- Nút "Try again" tải lại cả trang, để federation khởi tạo lại với registry mới. Cách này tránh việc Angular giữ lại kết quả `loadChildren` đã lỗi.
+- Không thêm `ErrorHandler` riêng. `provideBrowserGlobalErrorListeners` cùng error handler mặc định của Angular chỉ ghi log và không làm vỡ layout.
+- Kết quả kiểm chứng (ngày 2026-10-19):
+  - `nx run-many -t lint test build -p shell` qua với 14 test. Có test cho các trường hợp import lỗi, vi phạm hợp đồng, timeout, và router vẫn điều hướng được khi remote lỗi.
+  - Chromium với hệ thống thật, chặn `/apps/demo/**` để giả lập remote chết:
+    - `/demo` hiển thị "Demo is unavailable", header vẫn có "Alice Demo", sidebar vẫn có "Home, Demo", điều hướng về Trang chủ vẫn được.
+    - Bỏ chặn rồi bấm "Try again" thì trang "Demo remote" hiển thị lại.
+    - Không có vi phạm CSP.

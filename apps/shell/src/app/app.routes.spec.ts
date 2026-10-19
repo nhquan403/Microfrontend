@@ -68,3 +68,29 @@ describe('buildRoutes', () => {
     expect(last.path).toBe('**');
   });
 });
+
+describe('buildRoutes with a failing remote', () => {
+  it('keeps the navigation and renders the remote error page', async () => {
+    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    TestBed.configureTestingModule({
+      providers: [
+        provideHttpClient(),
+        provideRouter(buildRoutes([demo], [])),
+        {
+          provide: CURRENT_USER,
+          useValue: { sub: 'u', name: 'U', roles: ['demo-access'] },
+        },
+        {
+          provide: REMOTE_LOADER,
+          useValue: async () => {
+            throw new TypeError('Failed to fetch dynamically imported module');
+          },
+        },
+      ],
+    });
+    const router = TestBed.inject(Router);
+    expect(await router.navigateByUrl('/demo')).toBe(true);
+    expect(router.url).toBe('/demo');
+    vi.restoreAllMocks();
+  });
+});

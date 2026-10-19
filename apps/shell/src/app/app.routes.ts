@@ -4,6 +4,7 @@ import { roleGuard, type RegistryItem } from '@mf/shell-auth';
 import { ForbiddenPage } from './pages/forbidden.page';
 import { HomePage } from './pages/home.page';
 import { NotFoundPage } from './pages/not-found.page';
+import { loadRemoteRoutes } from './remote/load-remote-routes';
 import { REMOTE_LOADER } from './remote/remote-loader';
 
 /**
@@ -18,15 +19,7 @@ export function buildRoutes(
     path: item.route,
     title: item.title,
     canMatch: [roleGuard(item.requiredRoles)],
-    loadChildren: async () => {
-      const module = (await inject(REMOTE_LOADER)(
-        item.name,
-        item.exposedModule,
-      )) as {
-        routes: Routes;
-      };
-      return module.routes;
-    },
+    loadChildren: () => loadRemoteRoutes(inject(REMOTE_LOADER), item),
   }));
 
   const restricted: Routes = restrictedRoutes.map((route) => ({
