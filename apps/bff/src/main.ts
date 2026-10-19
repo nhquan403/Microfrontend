@@ -3,6 +3,7 @@ import { createOidcClient } from './auth/oidc-client';
 import { TokenProvider } from './auth/token-refresh';
 import { loadConfig } from './config';
 import { gatewayRoutes } from './gateway/gateway-routes';
+import { proxyWebSocketUpgrades } from './gateway/proxy';
 import { logger } from './logging/logger';
 import { loadRegistry } from './registry/registry';
 import { MemorySessionStore } from './session/memory-session-store';
@@ -28,13 +29,20 @@ async function main(): Promise<void> {
     shellStaticDir: config.shellStaticDir,
   });
   const app = createApp({ config, oidc, store, routes });
-  app.listen(config.port, () => {
+  const server = app.listen(config.port, () => {
     logger.info('bff listening', {
       port: config.port,
       origin: config.publicOrigin,
       mode: config.serveMode,
     });
   });
+  if (
+    config.serveMode === 'proxy' &&
+    config.shellDevUrl &&
+    !config.production
+  ) {
+    proxyWebSocketUpgrades(server, config.shellDevUrl);
+  }
 }
 
 main().catch((error) => {

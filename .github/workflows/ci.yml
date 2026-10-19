@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Audit, lint, test, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      - name: Audit dependencies (high and critical fail the build)
+        run: npm audit --audit-level=high
+      - run: npx nx run-many -t lint test build
+
+  e2e:
+    name: End-to-end (Keycloak + BFF + shell + remote)
+    runs-on: ubuntu-latest
+    needs: check
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: npm
+      - run: npm ci
+      # Throwaway secrets for an ephemeral Keycloak; nothing is read from repository secrets.
+      - name: Create .env with generated secrets
+        run: npm run env:create
+      - name: Start Keycloak
+        run: npm run infra:up
+      - name: Install Chromium for Playwright
+        run: npx playwright install --with-deps chromium
+      - name: Run e2e suite
+        run: npx nx e2e shell-e2e
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: |
+            playwright-report
+            apps/shell-e2e/test-results
+          retention-days: 7
+      - name: Stop Keycloak
+        if: always()
+        run: npm run infra:down

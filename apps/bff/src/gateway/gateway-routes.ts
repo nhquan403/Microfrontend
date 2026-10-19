@@ -1,16 +1,11 @@
 import { readFileSync } from 'node:fs';
-import type { IncomingMessage } from 'node:http';
 import { resolve } from 'node:path';
 import express, { Router, type RequestHandler } from 'express';
-import {
-  createProxyMiddleware,
-  responseInterceptor,
-} from 'http-proxy-middleware';
 import { requireAuth, requireRoles } from '../auth/require-auth';
 import type { TokenProvider } from '../auth/token-refresh';
-import { logger } from '../logging/logger';
 import { registryFor, type RemoteEntry } from '../registry/registry';
 import { injectNonce } from '../security/headers';
+import { proxyTo } from './proxy';
 
 export type ServeMode = 'static' | 'proxy';
 
@@ -21,16 +16,6 @@ export interface GatewayOptions {
   apiUpstreamUrl: string;
   shellDevUrl?: string;
   shellStaticDir: string;
-}
-
-function proxyError(name: string) {
-  return (err: Error, _req: IncomingMessage, res: unknown) => {
-    logger.warn('upstream unavailable', { upstream: name, error: err });
-    const response = res as express.Response;
-    if (typeof response.status === 'function' && !response.headersSent) {
-      response.status(502).json({ error: 'upstream_unavailable' });
-    }
-  };
 }
 
 export function registryRoutes(registry: RemoteEntry[]): Router {
@@ -65,14 +50,7 @@ export function appsRoutes(options: GatewayOptions): Router {
     } else {
       if (!entry.devUrl)
         throw new Error(`registry: "${entry.name}" has no devUrl`);
-      serve = createProxyMiddleware({
-        target: entry.devUrl,
-        changeOrigin: true,
-        on: {
-          proxyReq: (proxyReq) => proxyReq.removeHeader('cookie'),
-          error: proxyError(entry.name),
-        },
-      });
+      serve = proxyTo({ name: entry.name, target: entry.devUrl });
     }
     router.use(
       `/apps/${entry.name}`,
@@ -105,17 +83,10 @@ export function apiRoutes(options: GatewayOptions): Router {
     '/api',
     requireAuth,
     attachToken,
-    createProxyMiddleware({
+    proxyTo({
+      name: 'api',
       target: options.apiUpstreamUrl,
-      changeOrigin: true,
-      pathRewrite: (path) => `/api${path}`,
-      on: {
-        // Upstreams must not be able to plant cookies on the shell origin.
-        proxyRes: (proxyRes) => {
-          delete proxyRes.headers['set-cookie'];
-        },
-        error: proxyError('api'),
-      },
+      rewritePath: (path) => `/api${path}`,
     }),
   );
   return router;
@@ -137,27 +108,10 @@ export function shellRoutes(options: GatewayOptions): Router {
 
   if (!options.shellDevUrl)
     throw new Error('SHELL_DEV_URL is required in proxy mode');
-  const proxy = createProxyMiddleware({
+  const proxy = proxyTo({
+    name: 'shell',
     target: options.shellDevUrl,
-    changeOrigin: true,
-    ws: true,
-    selfHandleResponse: true,
-    on: {
-      proxyReq: (proxyReq) => {
-        proxyReq.removeHeader('cookie');
-        // Ask for an uncompressed body so the HTML can be rewritten.
-        proxyReq.setHeader('accept-encoding', 'identity');
-      },
-      proxyRes: responseInterceptor(async (buffer, proxyRes, _req, res) => {
-        const type = String(proxyRes.headers['content-type'] ?? '');
-        if (!type.includes('text/html')) return buffer;
-        const nonce =
-          (res as unknown as express.Response).locals.cspNonce ?? '';
-        res.setHeader('Cache-Control', 'no-store');
-        return injectNonce(buffer.toString('utf8'), nonce);
-      }),
-      error: proxyError('shell'),
-    },
+    transformHtml: (html, res) => injectNonce(html, res.locals.cspNonce ?? ''),
   });
   const htmlNavigationNeedsAuth: RequestHandler = (req, res, next) => {
     const accept = req.get('accept') ?? '';

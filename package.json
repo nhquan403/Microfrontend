@@ -8,7 +8,11 @@
   },
   "scripts": {
     "infra:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d --wait",
-    "infra:down": "docker compose --env-file .env -f infra/docker-compose.yml down"
+    "infra:down": "docker compose --env-file .env -f infra/docker-compose.yml down",
+    "env:create": "node tools/scripts/create-env.mjs",
+    "dev": "nx run-many -t serve -p shell demo-remote bff demo-api --parallel=4",
+    "check": "nx run-many -t lint test build",
+    "e2e": "nx e2e shell-e2e"
   },
   "devDependencies": {
     "@angular-devkit/core": "22.2.3",
@@ -32,6 +36,7 @@
     "@nx/workspace": "23.3.0",
     "@playwright/test": "1.64.1",
     "@schematics/angular": "22.2.3",
+    "@softarc/native-federation-orchestrator": "4.8.0",
     "@swc/helpers": "0.5.23",
     "@types/express": "5.0.6",
     "@types/express-session": "1.19.0",
@@ -44,6 +49,7 @@
     "esbuild": "0.27.7",
     "eslint": "9.39.5",
     "eslint-config-prettier": "10.1.8",
+    "eslint-plugin-playwright": "2.12.1",
     "happy-dom": "21.0.3",
     "jsdom": "27.4.0",
     "jsonc-eslint-parser": "2.4.2",
@@ -56,8 +62,7 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.71.2",
     "vite": "8.3.4",
-    "vitest": "4.1.12",
-    "@softarc/native-federation-orchestrator": "4.8.0"
+    "vitest": "4.1.12"
   },
   "dependencies": {
     "@angular-architects/native-federation": "22.2.3",
@@ -67,16 +72,16 @@
     "@angular/forms": "22.2.3",
     "@angular/platform-browser": "22.2.3",
     "@angular/router": "22.2.3",
+    "es-module-shims": "2.8.4",
     "express": "5.3.0",
     "express-rate-limit": "8.7.1",
     "express-session": "1.19.0",
     "helmet": "8.3.0",
-    "http-proxy-middleware": "4.2.0",
+    "httpxy": "0.5.5",
     "jose": "6.2.12",
     "lit": "3.3.3",
     "openid-client": "6.8.8",
-    "rxjs": "7.8.2",
-    "es-module-shims": "2.8.4"
+    "rxjs": "7.8.2"
   },
   "allowScripts": {
     "esbuild@0.28.2": true,
@@ -86,5 +91,8 @@
     "@parcel/watcher": false,
     "lmdb": false,
     "msgpackr-extract": false
+  },
+  "overrides": {
+    "undici": "7.29.1"
   }
 }

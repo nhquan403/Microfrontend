@@ -1,7 +1,7 @@
 ---
 title: "App host microfrontend Angular (shell + BFF + Keycloak)"
 description: "Dựng shell Angular dùng Native Federation, đăng nhập Keycloak qua BFF Node.js, design system Lit, kèm một remote demo và đầy đủ lớp security."
-status: in-progress
+status: completed
 priority: P1
 effort: 8d
 branch: master
@@ -64,7 +64,7 @@ Shell (Angular 22 + Native Federation)
 6. [Phase 06: Shell layout, auth, guard, dynamic routes](phase-06-shell.md). Trạng thái: completed. Cần phase 04 và 05.
 7. [Phase 07: demo-remote và hợp đồng remote](phase-07-demo-remote.md). Trạng thái: completed. Cần phase 06.
 8. [Phase 08: Xử lý lỗi remote](phase-08-remote-error-handling.md). Trạng thái: completed. Cần phase 07.
-9. [Phase 09: E2E, CI, tài liệu chạy local](phase-09-e2e-ci-docs.md). Trạng thái: pending. Cần phase 01–08.
+9. [Phase 09: E2E, CI, tài liệu chạy local](phase-09-e2e-ci-docs.md). Trạng thái: completed. Cần phase 01–08.
 
 ## Tiêu chí nghiệm thu (toàn kế hoạch)
 

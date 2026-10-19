@@ -1,0 +1,26 @@
+{
+  "name": "shell-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/shell-e2e/src",
+  "tags": ["scope:e2e", "type:e2e"],
+  "implicitDependencies": ["shell", "demo-remote", "bff", "demo-api"],
+  "targets": {
+    "e2e": {
+      "executor": "@nx/playwright:playwright",
+      "outputs": ["{workspaceRoot}/apps/shell-e2e/test-results"],
+      "dependsOn": [
+        {
+          "projects": ["shell", "demo-remote", "bff", "demo-api"],
+          "target": "build"
+        }
+      ],
+      "options": {
+        "config": "apps/shell-e2e/playwright.config.ts"
+      }
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    }
+  }
+}
