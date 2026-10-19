@@ -1,7 +1,10 @@
 import { createApp } from './app';
 import { createOidcClient } from './auth/oidc-client';
+import { TokenProvider } from './auth/token-refresh';
 import { loadConfig } from './config';
+import { gatewayRoutes } from './gateway/gateway-routes';
 import { logger } from './logging/logger';
+import { loadRegistry } from './registry/registry';
 import { MemorySessionStore } from './session/memory-session-store';
 
 async function main(): Promise<void> {
@@ -16,11 +19,20 @@ async function main(): Promise<void> {
     );
   }
 
-  const app = createApp({ config, oidc, store });
+  const routes = gatewayRoutes({
+    mode: config.serveMode,
+    registry: loadRegistry(config.registryFile),
+    tokens: new TokenProvider(oidc),
+    apiUpstreamUrl: config.apiUpstreamUrl,
+    shellDevUrl: config.shellDevUrl,
+    shellStaticDir: config.shellStaticDir,
+  });
+  const app = createApp({ config, oidc, store, routes });
   app.listen(config.port, () => {
     logger.info('bff listening', {
       port: config.port,
       origin: config.publicOrigin,
+      mode: config.serveMode,
     });
   });
 }

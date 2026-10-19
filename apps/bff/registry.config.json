@@ -1,0 +1,15 @@
+{
+  "remotes": [
+    {
+      "name": "demo",
+      "title": "Demo",
+      "icon": "grid",
+      "route": "demo",
+      "remoteEntry": "/apps/demo/remoteEntry.json",
+      "exposedModule": "./routes",
+      "requiredRoles": ["demo-access"],
+      "devUrl": "http://127.0.0.1:4201",
+      "staticDir": "dist/apps/demo-remote/browser"
+    }
+  ]
+}

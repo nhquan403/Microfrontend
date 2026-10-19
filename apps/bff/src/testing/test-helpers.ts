@@ -26,6 +26,9 @@ export function testConfig(overrides: Partial<BffConfig> = {}): BffConfig {
     },
     authRateLimitPerMinute: 1000,
     apiUpstreamUrl: 'http://127.0.0.1:1',
+    serveMode: 'static',
+    shellStaticDir: 'unused',
+    registryFile: 'unused',
     production: false,
     ...overrides,
   };

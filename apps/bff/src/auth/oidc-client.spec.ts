@@ -161,7 +161,9 @@ describe('createOidcClient against a real OIDC exchange', () => {
     expect(idp.lastCodeVerifier).toBe(request.codeVerifier);
     expect(result.claims?.['sub']).toBe('user-1');
     expect(result.claims?.['roles']).toEqual(['shell-user']);
-    expect(result.expiresInSeconds).toBe(300);
+    // expiresIn() counts down from the response time, so allow for a second elapsing.
+    expect(result.expiresInSeconds).toBeGreaterThanOrEqual(299);
+    expect(result.expiresInSeconds).toBeLessThanOrEqual(300);
   });
 
   it('rejects an ID token whose nonce does not match', async () => {

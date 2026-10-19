@@ -16,7 +16,11 @@ export interface BffConfig {
   };
   authRateLimitPerMinute: number;
   apiUpstreamUrl: string;
+  /** `proxy` forwards the shell and remotes to their dev servers; `static` serves built files. */
+  serveMode: 'static' | 'proxy';
   shellDevUrl?: string;
+  shellStaticDir: string;
+  registryFile: string;
   production: boolean;
 }
 
@@ -38,6 +42,16 @@ function positiveNumber(env: Env, name: string, fallback: number): number {
     throw new Error(`Environment variable ${name} must be a positive number`);
   }
   return value;
+}
+
+function serveMode(env: Env): 'static' | 'proxy' {
+  const mode =
+    env['SERVE_MODE'] ||
+    (env['NODE_ENV'] === 'production' ? 'static' : 'proxy');
+  if (mode !== 'static' && mode !== 'proxy') {
+    throw new Error('SERVE_MODE must be "static" or "proxy"');
+  }
+  return mode;
 }
 
 /** Reads and validates configuration once at startup. Secret values are never logged. */
@@ -69,7 +83,10 @@ export function loadConfig(env: Env = process.env): BffConfig {
       60,
     ),
     apiUpstreamUrl: required(env, 'API_UPSTREAM_URL'),
+    serveMode: serveMode(env),
     shellDevUrl: env['SHELL_DEV_URL'] || undefined,
+    shellStaticDir: env['SHELL_STATIC_DIR'] || 'dist/apps/shell/browser',
+    registryFile: env['REGISTRY_FILE'] || 'apps/bff/registry.config.json',
     production: env['NODE_ENV'] === 'production',
   };
 }

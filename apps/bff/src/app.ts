@@ -3,7 +3,9 @@ import { authRoutes } from './auth/auth-routes';
 import type { OidcClient } from './auth/oidc-client';
 import type { BffConfig } from './config';
 import { logger } from './logging/logger';
+import { cspReportRoute } from './security/csp-report';
 import { csrfProtection } from './security/csrf';
+import { securityHeaders } from './security/headers';
 import { authRateLimit } from './security/rate-limit';
 import {
   absoluteTimeout,
@@ -32,6 +34,9 @@ export function createApp({
   app.disable('x-powered-by');
   app.set('trust proxy', config.trustProxy);
 
+  app.use(securityHeaders());
+  // Browsers send CSP reports without cookies or CSRF headers.
+  app.use(cspReportRoute());
   app.use(localhostSecureShim(config));
   app.use(createSessionMiddleware(config, store));
   app.use(absoluteTimeout(config, now));
@@ -50,6 +55,13 @@ export function createApp({
       res: express.Response,
       _next: express.NextFunction,
     ) => {
+      // Client errors raised by middleware (e.g. express.static's 403/404) keep their status.
+      const status = (err as { status?: number })?.status;
+      if (typeof status === 'number' && status >= 400 && status < 500) {
+        if (!res.headersSent)
+          res.status(status).json({ error: 'request_rejected' });
+        return;
+      }
       logger.error('unhandled request error', {
         error: err,
         path: req.path,
