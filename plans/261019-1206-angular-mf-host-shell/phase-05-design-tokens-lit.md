@@ -1,7 +1,7 @@
 ---
 phase: 5
 title: "Design tokens và Lit components"
-status: pending
+status: completed
 effort: 1d
 dependsOn: [1]
 ---
@@ -48,3 +48,14 @@ Có bộ design tokens dạng CSS variables và một thư viện Web Components
 
 ## Rollback
 Thư viện độc lập, revert commit là đủ.
+
+## Ghi chú triển khai
+- Hai lib là non-buildable. App dùng chúng qua path alias `@mf/*`, và Native Federation chia sẻ qua mapping, nên không cần target `build`. Thay vào đó có target `typecheck` (`tsc --noEmit`).
+- Component viết bằng Lit 3, không dùng decorator: `static properties` cộng với field `declare` khởi tạo trong constructor.
+- `mf-sidebar` bỏ qua item có route không an toàn (không bắt đầu bằng đúng một `/`). Click có phím bổ trợ thì để trình duyệt tự xử lý, để vẫn mở được tab mới.
+- `mf-button` dùng `ElementInternals` khi trình duyệt hỗ trợ, nếu không thì lùi về `closest('form')`.
+- Có trang demo tĩnh `libs/design-tokens/demo/index.html` để duyệt màu.
+- Kết quả kiểm chứng (ngày 2026-10-19):
+  - `nx run-many -t typecheck lint test -p ui-components design-tokens --skip-nx-cache` qua. ui-components có 35 test, design-tokens có 7 test.
+  - Không có mã màu hex trong `components/`, không dùng `unsafeHTML` hay `innerHTML`.
+  - `defineMfComponents()` gọi hai lần không lỗi (có test).

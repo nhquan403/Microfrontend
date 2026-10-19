@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>mf design tokens</title>
+    <!-- Static review page: open this file directly in a browser. -->
+    <link rel="stylesheet" href="../src/tokens.css" />
+    <style>
+      body {
+        margin: 0;
+        font-family: var(--mf-font-family);
+      }
+      .theme {
+        background: var(--mf-color-surface);
+        color: var(--mf-color-text);
+        padding: var(--mf-space-xl);
+      }
+      .grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--mf-space-md);
+      }
+      .swatch {
+        width: 10rem;
+        padding: var(--mf-space-md);
+        border-radius: var(--mf-radius-md);
+        border: 1px solid var(--mf-color-border);
+        box-shadow: var(--mf-shadow-sm);
+        font-size: var(--mf-font-size-sm);
+      }
+      .primary {
+        background: var(--mf-color-primary);
+        color: var(--mf-color-on-primary);
+      }
+      .surface {
+        background: var(--mf-color-surface);
+        color: var(--mf-color-on-surface);
+      }
+      .muted {
+        background: var(--mf-color-surface-muted);
+        color: var(--mf-color-text-muted);
+      }
+      .danger {
+        background: var(--mf-color-danger);
+        color: var(--mf-color-on-danger);
+      }
+      .danger-surface {
+        background: var(--mf-color-danger-surface);
+        color: var(--mf-color-danger);
+      }
+      .success {
+        background: var(--mf-color-success);
+        color: var(--mf-color-on-success);
+      }
+      .success-surface {
+        background: var(--mf-color-success-surface);
+        color: var(--mf-color-success);
+      }
+      .info-surface {
+        background: var(--mf-color-info-surface);
+        color: var(--mf-color-text);
+      }
+      .focus {
+        outline: 2px solid var(--mf-color-focus-ring);
+        outline-offset: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <section class="theme">
+      <h2>Light</h2>
+      <div class="grid">
+        <div class="swatch primary">primary / on-primary</div>
+        <div class="swatch surface">surface / on-surface</div>
+        <div class="swatch muted">surface-muted / text-muted</div>
+        <div class="swatch danger">danger / on-danger</div>
+        <div class="swatch danger-surface">danger-surface</div>
+        <div class="swatch success">success / on-success</div>
+        <div class="swatch success-surface">success-surface</div>
+        <div class="swatch info-surface">info-surface</div>
+        <div class="swatch surface focus">focus-ring</div>
+      </div>
+    </section>
+    <section class="theme" data-theme="dark">
+      <h2>Dark</h2>
+      <div class="grid">
+        <div class="swatch primary">primary / on-primary</div>
+        <div class="swatch surface">surface / on-surface</div>
+        <div class="swatch muted">surface-muted / text-muted</div>
+        <div class="swatch danger">danger / on-danger</div>
+        <div class="swatch danger-surface">danger-surface</div>
+        <div class="swatch success">success / on-success</div>
+        <div class="swatch success-surface">success-surface</div>
+        <div class="swatch info-surface">info-surface</div>
+        <div class="swatch surface focus">focus-ring</div>
+      </div>
+    </section>
+  </body>
+</html>

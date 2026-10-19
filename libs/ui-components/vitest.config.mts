@@ -10,7 +10,7 @@ export default defineConfig(() => ({
     name: 'ui-components',
     watch: false,
     globals: true,
-    environment: 'node',
+    environment: 'happy-dom',
     include: ['{src,tests}/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
     reporters: ['default'],
     coverage: {
