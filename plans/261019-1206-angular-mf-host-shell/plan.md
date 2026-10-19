@@ -1,7 +1,7 @@
 ---
 title: "App host microfrontend Angular (shell + BFF + Keycloak)"
 description: "Dựng shell Angular dùng Native Federation, đăng nhập Keycloak qua BFF Node.js, design system Lit, kèm một remote demo và đầy đủ lớp security."
-status: pending
+status: in-progress
 priority: P1
 effort: 8d
 branch: master
@@ -56,7 +56,7 @@ Shell (Angular 22 + Native Federation)
 
 ## Các phase
 
-1. [Phase 01: Workspace Nx và tooling](phase-01-workspace-tooling.md). Trạng thái: pending. Không phụ thuộc phase nào.
+1. [Phase 01: Workspace Nx và tooling](phase-01-workspace-tooling.md). Trạng thái: completed. Không phụ thuộc phase nào.
 2. [Phase 02: Keycloak docker-compose và realm](phase-02-keycloak-realm.md). Trạng thái: pending. Cần phase 01.
 3. [Phase 03: BFF auth, session, CSRF](phase-03-bff-auth-session-csrf.md). Trạng thái: pending. Cần phase 01 và 02.
 4. [Phase 04: BFF gateway, registry, security headers](phase-04-bff-gateway-registry-headers.md). Trạng thái: pending. Cần phase 03.

@@ -1,7 +1,7 @@
 ---
 phase: 1
 title: "Workspace Nx và tooling"
-status: pending
+status: completed
 effort: 0.5d
 dependsOn: []
 ---
@@ -48,3 +48,11 @@ Có một Nx workspace chạy được, gồm khung sườn của mọi project,
 
 ## Rollback
 Workspace mới hoàn toàn, nên chỉ cần xoá các file đã sinh hoặc `git reset` về commit trước phase này.
+
+## Ghi chú triển khai
+- Node 24.22.0 LTS được cài vào `/opt/node24` trên máy dev này. Khi chạy lệnh cần `PATH=/opt/node24/bin:$PATH`.
+- Workspace được dựng thủ công (`package.json`, `nx.json`, `tsconfig.base.json`) rồi sinh project bằng generator. Template `create-nx-workspace` mặc định dùng kiểu TS solution và kèm app demo nên không phù hợp.
+- `libs/shell-auth` là thư viện buildable (ng-packagr 22.2.4), vì runner `vitest-angular` yêu cầu như vậy.
+- Bỏ `baseUrl` khỏi `tsconfig.base.json` vì TypeScript 6 báo deprecated.
+- `allowScripts` trong `package.json` chỉ cho phép install script của `esbuild`, `nx`, `unrs-resolver`. Các gói rebuild bằng node-gyp bị từ chối vì đã có bản prebuilt.
+- Kết quả kiểm chứng: `nx run-many -t lint test build` cho 19/19 task thành công. `npm ls @angular/core` chỉ có `22.2.3`.
