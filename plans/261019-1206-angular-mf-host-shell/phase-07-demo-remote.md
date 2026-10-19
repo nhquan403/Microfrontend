@@ -1,7 +1,7 @@
 ---
 phase: 7
 title: "demo-remote và hợp đồng remote"
-status: pending
+status: completed
 effort: 0.75d
 dependsOn: [6]
 ---
@@ -51,3 +51,21 @@ Có một remote Angular expose `./routes`, được shell tải từ URL trong 
 
 ## Rollback
 Xoá mục `demo` trong registry để shell ngừng tải remote ngay mà không cần deploy lại shell. Sau đó revert commit.
+
+## Ghi chú triển khai
+- Remote tên `demo`, expose `./routes` gồm trang chính và trang `items/:id`. Remote dùng `AuthService`, `HttpClient` và design system của shell.
+- demo-api (Express trên `127.0.0.1:4100`) kiểm JWT bằng JWKS của Keycloak (issuer, audience `demo-api`, hạn dùng) và yêu cầu role `demo-access`.
+- Không cần `deployUrl` hay `baseHref` cho remote, vì Native Federation tải chunk tương đối theo `remoteEntry.json` dưới `/apps/demo/`.
+- Hợp đồng remote được viết ở `docs/remote-contract.md`.
+- Kết quả kiểm chứng (ngày 2026-10-19, hệ thống thật: Keycloak, BFF chạy `SERVE_MODE=static`, demo-api, Chromium):
+  - `nx run-many -t lint test build -p demo-remote demo-api` qua. demo-remote có 4 test, demo-api có 7 test (sai audience, hết hạn, sai khoá, thiếu role đều bị từ chối).
+  - `alice` mở `/demo`:
+    - Remote hiển thị "Demo remote", dữ liệu từ demo-api, và POST `/api/echo` qua CSRF của Angular thành công.
+    - Chỉ có một request tới bundle `@angular/core` (của shell).
+    - `remoteEntry.json` được tải từ `/apps/demo/`, đúng URL trong registry.
+    - Không có vi phạm CSP hay Trusted Types.
+  - Kiểm phía server:
+    - `bob` gọi `/apps/demo/remoteEntry.json` và `/api/hello` đều nhận 403. `alice` gọi `/apps/demo/remoteEntry.json` nhận 200.
+    - POST `/api/echo` thiếu CSRF trả 403, khác Origin trả 403, hợp lệ trả 200.
+    - `/registry` khi chưa đăng nhập trả 401.
+    - Log BFF không có chuỗi `eyJ`.

@@ -7,6 +7,54 @@
   "tags": ["scope:remote", "type:app"],
   "targets": {
     "build": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {
+        "cacheExternalArtifacts": true,
+        "tsConfig": "apps/demo-remote/tsconfig.federation.json"
+      },
+      "configurations": {
+        "production": {
+          "target": "demo-remote:esbuild:production"
+        },
+        "development": {
+          "target": "demo-remote:esbuild:development",
+          "dev": true
+        }
+      },
+      "defaultConfiguration": "production"
+    },
+    "serve": {
+      "executor": "@angular-architects/native-federation:build",
+      "options": {
+        "target": "demo-remote:serve-original:development",
+        "tsConfig": "apps/demo-remote/tsconfig.federation.json",
+        "rebuildDelay": 500,
+        "cacheExternalArtifacts": true,
+        "dev": true,
+        "devServer": true,
+        "port": 4201
+      },
+      "continuous": true
+    },
+    "lint": {
+      "executor": "@nx/eslint:lint"
+    },
+    "test": {
+      "executor": "@angular/build:unit-test",
+      "options": {
+        "watch": false
+      }
+    },
+    "serve-static": {
+      "continuous": true,
+      "executor": "@nx/web:file-server",
+      "options": {
+        "buildTarget": "demo-remote:build",
+        "staticFilePath": "dist/apps/demo-remote/browser",
+        "spa": true
+      }
+    },
+    "esbuild": {
       "executor": "@angular/build:application",
       "outputs": ["{options.outputPath}"],
       "defaultConfiguration": "production",
@@ -21,7 +69,8 @@
             "input": "apps/demo-remote/public"
           }
         ],
-        "styles": ["apps/demo-remote/src/styles.scss"]
+        "styles": ["apps/demo-remote/src/styles.scss"],
+        "polyfills": ["es-module-shims"]
       },
       "configurations": {
         "production": {
@@ -46,35 +95,20 @@
         }
       }
     },
-    "serve": {
+    "serve-original": {
       "continuous": true,
       "executor": "@angular/build:dev-server",
       "defaultConfiguration": "development",
       "configurations": {
         "production": {
-          "buildTarget": "demo-remote:build:production"
+          "buildTarget": "demo-remote:esbuild:production"
         },
         "development": {
-          "buildTarget": "demo-remote:build:development"
+          "buildTarget": "demo-remote:esbuild:development"
         }
-      }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint"
-    },
-    "test": {
-      "executor": "@angular/build:unit-test",
+      },
       "options": {
-        "watch": false
-      }
-    },
-    "serve-static": {
-      "continuous": true,
-      "executor": "@nx/web:file-server",
-      "options": {
-        "buildTarget": "demo-remote:build",
-        "staticFilePath": "dist/apps/demo-remote/browser",
-        "spa": true
+        "port": 4201
       }
     }
   }
