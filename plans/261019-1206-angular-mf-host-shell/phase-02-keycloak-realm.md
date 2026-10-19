@@ -1,7 +1,7 @@
 ---
 phase: 2
 title: "Keycloak docker-compose và realm"
-status: pending
+status: completed
 effort: 0.5d
 dependsOn: [1]
 ---
@@ -55,3 +55,12 @@ Chạy Keycloak 26.8.1 local trên port 8080 bằng một lệnh, kèm realm m�
 
 ## Rollback
 `npm run infra:down -v` xoá container và volume. Xoá thư mục `infra/`.
+
+## Ghi chú triển khai
+- Realm được viết tay thành `infra/keycloak/realm-microfrontend.json` thay vì export từ giao diện. Client secret và mật khẩu user dùng placeholder `${OIDC_CLIENT_SECRET}`, `${E2E_ALICE_PASSWORD}`, `${E2E_BOB_PASSWORD}`. Keycloak tự thay các placeholder này bằng biến môi trường khi import.
+- Mật khẩu dev không ghi vào README. Giá trị ngẫu nhiên được sinh vào `.env` (đã gitignore). Hướng dẫn tạo `.env` sẽ nằm trong README gốc ở phase 09.
+- Keycloak 26 dùng `KC_BOOTSTRAP_ADMIN_USERNAME/PASSWORD`. Compose ánh xạ từ `KEYCLOAK_ADMIN/KEYCLOAK_ADMIN_PASSWORD` trong `.env`.
+- Kết quả kiểm chứng (ngày 2026-10-19):
+  - Discovery trả issuer `http://localhost:8080/realms/microfrontend`, có `S256` và `end_session_endpoint`.
+  - Request authorize thiếu PKCE bị chuyển về với `error=invalid_request` (`Missing parameter: code_challenge_method`). Có PKCE thì trả 200.
+  - `alice` và `bob` đăng nhập qua form đều nhận được code. Sai mật khẩu thì không nhận được code.

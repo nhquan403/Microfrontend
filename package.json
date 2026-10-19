@@ -6,7 +6,10 @@
   "engines": {
     "node": ">=24.15.0"
   },
-  "scripts": {},
+  "scripts": {
+    "infra:up": "docker compose --env-file .env -f infra/docker-compose.yml up -d --wait",
+    "infra:down": "docker compose --env-file .env -f infra/docker-compose.yml down"
+  },
   "devDependencies": {
     "@angular-devkit/core": "22.2.3",
     "@angular-devkit/schematics": "22.2.3",
