@@ -1,7 +1,7 @@
 ---
 phase: 3
 title: "BFF auth, session, CSRF"
-status: pending
+status: completed
 effort: 1.5d
 dependsOn: [1, 2]
 ---
@@ -65,3 +65,20 @@ BFF thực hiện OIDC Authorization Code + PKCE với Keycloak, giữ token ph�
 
 ## Rollback
 Các thay đổi chỉ nằm trong `apps/bff`, nên revert commit của phase này là đủ.
+
+## Ghi chú triển khai
+- `createApp()` nằm trong `app.ts`, nhận `OidcClient` và `SessionStore` qua tham số để test không cần mock module.
+- openid-client v6 mặc định không kiểm chữ ký ID token nhận từ token endpoint (spec cho phép khi đi qua TLS). Mình bật `enableNonRepudiationChecks` để luôn kiểm chữ ký theo JWKS.
+- express-session không phát cookie `Secure` khi request không phải TLS. Khi `PUBLIC_ORIGIN` là `http://localhost`, middleware `localhostSecureShim` đánh dấu request là https để cookie `__Host-sid` vẫn có `Secure`. Với origin khác localhost thì shim không chạy.
+- Callback tự kiểm `state` trước, sau đó openid-client kiểm lại `state` và kiểm PKCE, chữ ký, `nonce`.
+- Pending login hết hạn sau 10 phút.
+- Rate limit cho `/auth/*` mặc định là 60 request mỗi phút (`AUTH_RATE_LIMIT_PER_MINUTE`), để e2e gọi `/auth/me` liên tục không bị chặn.
+- Kết quả kiểm chứng (ngày 2026-10-19):
+  - `nx run-many -t lint test build -p bff` qua, 39 unit test.
+  - Test dùng IdP giả trong process với openid-client thật: sai nonce bị từ chối, sai chữ ký bị từ chối, sai state bị từ chối, verifier PKCE được gửi đúng.
+  - Chạy thật với Keycloak 26.8.1 (`alice`):
+    - Callback 302 về `/demo`.
+    - `__Host-sid` có `HttpOnly; Secure; SameSite=Lax; Path=/`. `XSRF-TOKEN` có `Secure; SameSite=Strict` và không HttpOnly.
+    - `/auth/me` trả profile cùng roles `shell-user, demo-access`, không có JWT.
+    - Logout thiếu CSRF trả 403. Logout hợp lệ trả URL end_session có `id_token_hint`, Keycloak redirect về `http://localhost:4000/`, sau đó `/auth/me` trả 401.
+    - Log BFF không có chuỗi `eyJ`.
