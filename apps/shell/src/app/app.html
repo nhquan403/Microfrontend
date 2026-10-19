@@ -1,2 +1,18 @@
-<sh-nx-welcome></sh-nx-welcome>
-<router-outlet></router-outlet>
+<mf-app-header (mf-logout)="logout()">
+  <span slot="brand">Microfrontend</span>
+  <span slot="user" data-testid="user-name">{{ auth.user().name }}</span>
+</mf-app-header>
+
+<div class="layout">
+  <mf-sidebar
+    [items]="sidebarItems"
+    [active]="activeRoute()"
+    (mf-navigate)="navigate($event)"
+  ></mf-sidebar>
+
+  <main class="content" id="content">
+    <router-outlet />
+  </main>
+</div>
+
+<mf-app-footer>© {{ year }} Microfrontend</mf-app-footer>

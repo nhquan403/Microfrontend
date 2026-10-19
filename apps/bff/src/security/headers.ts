@@ -36,6 +36,19 @@ export function securityHeaders(): RequestHandler[] {
         baseUri: ["'self'"],
         formAction: ["'self'"],
         frameAncestors: ["'none'"],
+        // DOM XSS sinks only accept Trusted Types from these known policies: native
+        // federation's and the shell's import-map loaders, es-module-shims, Angular and Lit.
+        // Verified in Chromium.
+        requireTrustedTypesFor: ["'script'"],
+        trustedTypes: [
+          'nfo',
+          'mf-import-map',
+          'es-module-shims',
+          'angular',
+          'angular#bundler',
+          'lit-html',
+          "'allow-duplicates'",
+        ],
         reportUri: [CSP_REPORT_PATH],
       },
     },

@@ -26,7 +26,13 @@ export interface RegistryResponse {
     icon?: string;
     route: string;
     exposedModule: string;
+    requiredRoles: string[];
   }[];
+  /**
+   * Route segments of remotes the user may not open, so the shell can show "forbidden"
+   * instead of "not found". Carries no URLs or manifest data.
+   */
+  restrictedRoutes: string[];
 }
 
 const NAME = /^[a-z][a-z0-9-]{0,40}$/;
@@ -96,12 +102,18 @@ export function registryFor(
   const visible = entries.filter((e) => hasAllRoles(roles, e.requiredRoles));
   return {
     manifest: Object.fromEntries(visible.map((e) => [e.name, e.remoteEntry])),
-    items: visible.map(({ name, title, icon, route, exposedModule }) => ({
-      name,
-      title,
-      icon,
-      route,
-      exposedModule,
-    })),
+    items: visible.map(
+      ({ name, title, icon, route, exposedModule, requiredRoles }) => ({
+        name,
+        title,
+        icon,
+        route,
+        exposedModule,
+        requiredRoles,
+      }),
+    ),
+    restrictedRoutes: entries
+      .filter((e) => !visible.includes(e))
+      .map((e) => e.route),
   };
 }

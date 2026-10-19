@@ -118,14 +118,25 @@ describe('GET /registry', () => {
     expect(res.headers['cache-control']).toBe('no-store');
     expect(res.body.manifest).toEqual({ demo: '/apps/demo/remoteEntry.json' });
     expect(res.body.items).toEqual([
-      { name: 'demo', title: 'Demo', route: 'demo', exposedModule: './routes' },
+      {
+        name: 'demo',
+        title: 'Demo',
+        route: 'demo',
+        exposedModule: './routes',
+        requiredRoles: ['demo-access'],
+      },
     ]);
+    expect(res.body.restrictedRoutes).toEqual([]);
   });
 
   it('hides the demo remote from a user without the role', async () => {
     const { app, jar } = await signedIn(['shell-user']);
     const res = await request(app).get('/registry').set('Cookie', jar.header());
-    expect(res.body).toEqual({ manifest: {}, items: [] });
+    expect(res.body).toEqual({
+      manifest: {},
+      items: [],
+      restrictedRoutes: ['demo'],
+    });
   });
 });
 
@@ -245,6 +256,7 @@ describe('shell and security headers', () => {
     expect(csp).toContain("frame-ancestors 'none'");
     expect(csp).toContain("object-src 'none'");
     expect(csp).toContain('report-uri /csp-report');
+    expect(csp).toContain("require-trusted-types-for 'script'");
     expect(csp).not.toContain('unsafe-inline');
     expect(csp).not.toContain('unsafe-eval');
     expect(res.headers['strict-transport-security']).toContain(

@@ -2,12 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>shell</title>
+    <title>Microfrontend</title>
     <base href="/" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" type="image/x-icon" href="favicon.ico" />
   </head>
   <body>
-    <sh-root></sh-root>
+    <!-- The BFF replaces the placeholder with the per-request CSP nonce. -->
+    <sh-root ngCspNonce="__CSP_NONCE__"></sh-root>
   </body>
 </html>
