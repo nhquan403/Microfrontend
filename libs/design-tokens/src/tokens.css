@@ -1,0 +1,85 @@
+/*
+ * Micro-frontend design tokens.
+ * Naming: --mf-<category>-<role>[-<variant>]. See README.md.
+ * Loaded once by the shell; every remote and every mf-* Web Component reads
+ * these variables (custom properties inherit through Shadow DOM boundaries).
+ */
+:root {
+  color-scheme: light;
+
+  /* Color */
+  --mf-color-primary: #2557d6;
+  --mf-color-primary-hover: #1c45ae;
+  --mf-color-on-primary: #ffffff;
+  --mf-color-surface: #ffffff;
+  --mf-color-surface-muted: #f3f5f9;
+  --mf-color-on-surface: #1b2230;
+  --mf-color-text: #1b2230;
+  --mf-color-text-muted: #5a6478;
+  --mf-color-border: #d5dae3;
+  --mf-color-danger: #c62828;
+  --mf-color-danger-hover: #a31f1f;
+  --mf-color-on-danger: #ffffff;
+  --mf-color-danger-surface: #fdecec;
+  --mf-color-success: #1e7d3c;
+  --mf-color-on-success: #ffffff;
+  --mf-color-success-surface: #e7f5ec;
+  --mf-color-info-surface: #e8effd;
+  --mf-color-focus-ring: #2557d6;
+
+  /* Space (4px scale) */
+  --mf-space-xs: 0.25rem;
+  --mf-space-sm: 0.5rem;
+  --mf-space-md: 1rem;
+  --mf-space-lg: 1.5rem;
+  --mf-space-xl: 2rem;
+
+  /* Radius */
+  --mf-radius-sm: 0.25rem;
+  --mf-radius-md: 0.5rem;
+  --mf-radius-lg: 0.75rem;
+  --mf-radius-full: 9999px;
+
+  /* Font */
+  --mf-font-family:
+    system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
+  --mf-font-family-mono:
+    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --mf-font-size-sm: 0.875rem;
+  --mf-font-size-md: 1rem;
+  --mf-font-size-lg: 1.25rem;
+  --mf-font-weight-regular: 400;
+  --mf-font-weight-bold: 600;
+  --mf-font-line-height: 1.5;
+
+  /* Shadow */
+  --mf-shadow-sm: 0 1px 2px rgb(16 24 40 / 0.08);
+  --mf-shadow-md: 0 4px 12px rgb(16 24 40 / 0.12);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --mf-color-primary: #7aa2ff;
+  --mf-color-primary-hover: #9db9ff;
+  --mf-color-on-primary: #0b1530;
+  --mf-color-surface: #141922;
+  --mf-color-surface-muted: #1d2430;
+  --mf-color-on-surface: #e6e9ef;
+  --mf-color-text: #e6e9ef;
+  --mf-color-text-muted: #a3acbd;
+  --mf-color-border: #2f3846;
+  --mf-color-danger: #ff7a7a;
+  --mf-color-danger-hover: #ff9a9a;
+  --mf-color-on-danger: #2a0606;
+  --mf-color-danger-surface: #3a1818;
+  --mf-color-success: #5fd38a;
+  --mf-color-on-success: #06240f;
+  --mf-color-success-surface: #12301d;
+  --mf-color-info-surface: #1a2744;
+  --mf-color-focus-ring: #7aa2ff;
+
+  --mf-shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
+  --mf-shadow-md: 0 4px 12px rgb(0 0 0 / 0.5);
+}

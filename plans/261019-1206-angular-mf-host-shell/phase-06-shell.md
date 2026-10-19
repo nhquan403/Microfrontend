@@ -1,7 +1,7 @@
 ---
 phase: 6
 title: "Shell layout, auth, guard, dynamic routes"
-status: pending
+status: completed
 effort: 1.5d
 dependsOn: [4, 5]
 ---
@@ -59,3 +59,23 @@ Shell Angular kiểm tra session trước khi khởi động, dựng layout bằ
 
 ## Rollback
 Revert commit. Shell trở về khung sườn của phase 01.
+
+## Quyết định CSP với Native Federation (đã chốt bằng thực nghiệm ngày 2026-10-19)
+- **Chọn: nonce cho mọi script inline, kèm Trusted Types bắt buộc. Không dùng `blob:`, không dùng `unsafe-inline` hay `unsafe-eval`.**
+- CSP thực tế: `script-src 'self' 'nonce-…'`, `style-src 'self' 'nonce-…'`, `require-trusted-types-for 'script'`, `trusted-types nfo mf-import-map es-module-shims angular angular#bundler lit-html 'allow-duplicates'`.
+- Lý do và bằng chứng:
+  - Khi có `ngCspNonce` trong `index.html`, Angular build tự gắn placeholder nonce cho `<style>` critical CSS, script `esms-options` và script gỡ `media` của beasties. BFF thay placeholder `__CSP_NONCE__` bằng nonce của từng request.
+  - Orchestrator của Native Federation cho phép thay `setImportMapFn`. Shell tự chèn `<script type="importmap-shim">` kèm nonce (`apps/shell/src/federation/nonce-import-map.ts`).
+  - Khi bật Trusted Types, nội dung import map phải là `TrustedScript`. Vì vậy shell dùng policy riêng `mf-import-map`, chỉ nhận chuỗi `JSON.stringify` của import map. es-module-shims tự tạo policy tên `es-module-shims`, nên tên này cũng được khai báo.
+  - Kiểm bằng Chromium (Playwright với `/opt/pw-browsers/chromium`), đăng nhập Keycloak thật, BFF chạy `SERVE_MODE=static`:
+    - Không có sự kiện `securitypolicyviolation`, không có CSP report gửi về BFF.
+    - `alice` thấy "Home, Demo". `bob` vào `/demo` thì bị chuyển sang `/forbidden`.
+  - Trong quá trình thử, thiếu policy `es-module-shims` hoặc `mf-import-map` đều làm shell không khởi động được. Nghĩa là Trusted Types thực sự đang được ép buộc.
+- Giới hạn: Trusted Types mới có trên Chromium. Firefox và Safari bỏ qua directive này nhưng vẫn áp dụng nonce.
+
+## Ghi chú triển khai
+- Registry trả thêm `requiredRoles` cho remote user được phép, và `restrictedRoutes` (chỉ tên route) cho remote không được phép. Nhờ vậy shell hiển thị `/forbidden` thay vì not-found, mà không lộ URL hay manifest.
+- `main.ts` kiểm tra `/auth/me`, sau đó lấy `/registry`, rồi `initFederation(manifest)` và bootstrap. Nếu `remoteEntry` của một remote lỗi (ví dụ 404), shell vẫn khởi động.
+- Cấu hình share dùng chung ở `tools/federation/shared-federation-config.mjs`: Angular, rxjs, Lit là singleton `strictVersion`, các lib `@mf/*` share qua mapping. Bỏ qua các gói chỉ chạy phía server và các entry phụ `@angular/platform-browser/animations*`, vì `@angular/animations` không được cài.
+- Dev server của shell cố định port 4200.
+- Kết quả kiểm chứng: `nx run-many -t lint test build -p shell shell-auth bff` qua. shell có 9 test, shell-auth có 9 test, bff có 56 test.

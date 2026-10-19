@@ -1,0 +1,35 @@
+# build output
+/dist
+/tmp
+/out-tsc
+/coverage
+/test-results
+/playwright-report
+/apps/shell-e2e/test-results
+/apps/shell-e2e/playwright-report
+
+# dependencies
+node_modules
+
+# environment
+.env
+.env.*
+!.env.example
+
+# nx
+.nx/cache
+.nx/workspace-data
+
+# editors and OS
+/.idea
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+Thumbs.db
+npm-debug.log
+
+.angular
+
+__screenshots__/
+vitest.config.*.timestamp*
+.vitest

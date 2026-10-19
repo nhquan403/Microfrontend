@@ -1,0 +1,14 @@
+// Design tokens (--mf-*) are loaded once for the whole page via project.json "styles".
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: var(--mf-font-family);
+  font-size: var(--mf-font-size-md);
+  color: var(--mf-color-text);
+  background: var(--mf-color-surface);
+}

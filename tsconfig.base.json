@@ -1,0 +1,21 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "bundler",
+    "importHelpers": true,
+    "target": "es2022",
+    "module": "esnext",
+    "lib": ["es2022", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "paths": {
+      "@mf/ui-components": ["./libs/ui-components/src/index.ts"],
+      "@mf/design-tokens": ["./libs/design-tokens/src/index.ts"],
+      "@mf/shell-auth": ["./libs/shell-auth/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

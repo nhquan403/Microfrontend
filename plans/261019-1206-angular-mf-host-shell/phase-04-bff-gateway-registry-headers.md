@@ -1,7 +1,7 @@
 ---
 phase: 4
 title: "BFF gateway, registry, security headers"
-status: pending
+status: completed
 effort: 1d
 dependsOn: [3]
 ---
@@ -58,3 +58,18 @@ BFF trở thành origin duy nhất của hệ thống. Nó phục vụ shell và
 
 ## Rollback
 Revert commit của phase. Phase 03 vẫn chạy độc lập.
+
+## Ghi chú triển khai
+- Registry nằm ở `apps/bff/registry.config.json` (đường dẫn đổi được qua `REGISTRY_FILE`). `parseRegistry` kiểm chặt: tên hợp lệ, không trùng tên, và `remoteEntry` phải nằm dưới `/apps/<name>/`.
+- `SERVE_MODE=proxy|static`. Mặc định là `proxy` khi dev và `static` khi production. E2E sẽ dùng `static` với bản build thật.
+- Remote được mount tại `/apps/<name>`. Express tự bỏ tiền tố, nên remote không cần `deployUrl`, vì Native Federation tải chunk tương đối theo vị trí của `remoteEntry.json`.
+- Error handler giữ nguyên status 4xx do middleware ném ra (ví dụ 403 của `express.static` khi thử path traversal), thay vì trả 500.
+- Header `Set-Cookie` từ upstream bị xoá trong `proxyRes`.
+- Kết quả kiểm chứng (ngày 2026-10-19):
+  - `nx run-many -t test lint build -p bff --skip-nx-cache` qua với 56 test, chạy ổn định qua hai lần.
+  - Test gateway (proxy thật tới một upstream chạy trong process) xác nhận:
+    - `/registry` trả 401 khi chưa đăng nhập, có remote demo với role `demo-access`, rỗng khi thiếu role.
+    - `/apps/demo/*` trả 200, 403, 401, 404 đúng từng trường hợp, và chặn path traversal.
+    - `/api/*` thiếu CSRF trả 403. Khi qua được thì request lên upstream có Bearer, không có cookie, không có header CSRF, và cookie của upstream bị xoá.
+    - CSP có nonce đổi theo từng request, không có `unsafe-inline` hay `unsafe-eval`, kèm đủ HSTS, Referrer-Policy, nosniff, X-Frame-Options, COOP, Permissions-Policy.
+  - Phần kiểm chứng với remote và demo-api thật được chạy ở phase 07. Phần đánh giá Trusted Types được làm ở phase 06.

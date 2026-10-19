@@ -1,7 +1,7 @@
 ---
 phase: 9
 title: "E2E, CI, tài liệu chạy local"
-status: pending
+status: completed
 effort: 1.25d
 dependsOn: [1, 2, 3, 4, 5, 6, 7, 8]
 ---
@@ -53,3 +53,17 @@ Tự động kiểm chứng toàn bộ 8 tiêu chí nghiệm thu bằng Playwrig
 
 ## Rollback
 Xoá workflow hoặc project e2e. Không ảnh hưởng tới runtime.
+
+## Ghi chú triển khai
+- E2E chạy trên bản build production, BFF ở `SERVE_MODE=static`. Playwright tự khởi động demo-api và BFF qua `webServer`, Keycloak chạy sẵn bằng `npm run infra:up`. Target `e2e` phụ thuộc vào target `build` của shell, demo-remote, bff và demo-api.
+- `PW_CHROMIUM_PATH` cho phép dùng Chromium có sẵn trên máy. Trong CI thì chạy `npx playwright install --with-deps chromium`.
+- `tools/scripts/create-env.mjs` (`npm run env:create`) tạo `.env` với secret ngẫu nhiên. CI cũng dùng script này, nên không cần GitHub Secrets.
+- Để `npm audit --audit-level=high` qua một cách trung thực, `http-proxy-middleware` được thay bằng `httpxy` qua module `apps/bff/src/gateway/proxy.ts`. Lý do: chuỗi `micromatch → braces` của nó có lỗ hổng mức high chưa có bản vá. `undici` (tooling của Nx) được override lên 7.29.1.
+- Script npm: `env:create`, `infra:up`, `infra:down`, `dev`, `check`, `e2e`.
+- Tắt `inspect` của `@nx/js:node` cho bff và demo-api, để hai server không tranh nhau port 9229 khi chạy `npm run dev`.
+- Kết quả kiểm chứng (ngày 2026-10-19):
+  - `nx run-many -t lint test build --skip-nx-cache` qua cho 8 project.
+  - `nx e2e shell-e2e` qua 12/12 test trong Chromium (Keycloak 26.8.1 thật), phủ cả 8 tiêu chí nghiệm thu.
+  - `npm audit --audit-level=high` trả exit 0 (còn 24 lỗ hổng moderate hoặc low trong dev tooling).
+  - `npm run dev` (chế độ proxy) chạy được với CSP cùng Trusted Types, đã kiểm bằng Chromium.
+  - CI trên GitHub Actions chưa chạy được ở đây, vì workflow chỉ chạy khi có push lên `master` hoặc khi có PR. Sẽ được kiểm khi mở PR.

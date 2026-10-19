@@ -1,7 +1,7 @@
 ---
 title: "App host microfrontend Angular (shell + BFF + Keycloak)"
 description: "Dựng shell Angular dùng Native Federation, đăng nhập Keycloak qua BFF Node.js, design system Lit, kèm một remote demo và đầy đủ lớp security."
-status: pending
+status: completed
 priority: P1
 effort: 8d
 branch: master
@@ -56,15 +56,15 @@ Shell (Angular 22 + Native Federation)
 
 ## Các phase
 
-1. [Phase 01: Workspace Nx và tooling](phase-01-workspace-tooling.md). Trạng thái: pending. Không phụ thuộc phase nào.
-2. [Phase 02: Keycloak docker-compose và realm](phase-02-keycloak-realm.md). Trạng thái: pending. Cần phase 01.
-3. [Phase 03: BFF auth, session, CSRF](phase-03-bff-auth-session-csrf.md). Trạng thái: pending. Cần phase 01 và 02.
-4. [Phase 04: BFF gateway, registry, security headers](phase-04-bff-gateway-registry-headers.md). Trạng thái: pending. Cần phase 03.
-5. [Phase 05: Design tokens và Lit components](phase-05-design-tokens-lit.md). Trạng thái: pending. Cần phase 01. Làm song song được với phase 02–04.
-6. [Phase 06: Shell layout, auth, guard, dynamic routes](phase-06-shell.md). Trạng thái: pending. Cần phase 04 và 05.
-7. [Phase 07: demo-remote và hợp đồng remote](phase-07-demo-remote.md). Trạng thái: pending. Cần phase 06.
-8. [Phase 08: Xử lý lỗi remote](phase-08-remote-error-handling.md). Trạng thái: pending. Cần phase 07.
-9. [Phase 09: E2E, CI, tài liệu chạy local](phase-09-e2e-ci-docs.md). Trạng thái: pending. Cần phase 01–08.
+1. [Phase 01: Workspace Nx và tooling](phase-01-workspace-tooling.md). Trạng thái: completed. Không phụ thuộc phase nào.
+2. [Phase 02: Keycloak docker-compose và realm](phase-02-keycloak-realm.md). Trạng thái: completed. Cần phase 01.
+3. [Phase 03: BFF auth, session, CSRF](phase-03-bff-auth-session-csrf.md). Trạng thái: completed. Cần phase 01 và 02.
+4. [Phase 04: BFF gateway, registry, security headers](phase-04-bff-gateway-registry-headers.md). Trạng thái: completed. Cần phase 03.
+5. [Phase 05: Design tokens và Lit components](phase-05-design-tokens-lit.md). Trạng thái: completed. Cần phase 01. Làm song song được với phase 02–04.
+6. [Phase 06: Shell layout, auth, guard, dynamic routes](phase-06-shell.md). Trạng thái: completed. Cần phase 04 và 05.
+7. [Phase 07: demo-remote và hợp đồng remote](phase-07-demo-remote.md). Trạng thái: completed. Cần phase 06.
+8. [Phase 08: Xử lý lỗi remote](phase-08-remote-error-handling.md). Trạng thái: completed. Cần phase 07.
+9. [Phase 09: E2E, CI, tài liệu chạy local](phase-09-e2e-ci-docs.md). Trạng thái: completed. Cần phase 01–08.
 
 ## Tiêu chí nghiệm thu (toàn kế hoạch)
 
